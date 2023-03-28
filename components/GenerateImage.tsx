@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAccount } from "wagmi";
-import GeneratedImage from "./GeneratedImage";
+import Image from "./Image";
 import Menu from "./Menu";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
@@ -14,11 +14,11 @@ const GenerateImage = (props: Props) => {
   const [photo, setPhoto] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [liked, setLiked] = useState<boolean>(false);
-  const [disLiked, setDisLiked] = useState<boolean>(false);
+  const [dislike, setDislike] = useState<boolean>(false);
   const [generated, setGenerated] = useState<boolean>(false);
   const { address, isConnected } = useAccount();
 
-  const uploadToStorage = async (generatedPhoto: string) => {
+  const uploadToStorage = async (generatedImage: string) => {
     let symbols = "qwertyuiopasdfghjklzxcvvbnnm1234567890!@#$%^&*()_+<>?|}{[]~";
     let result = "";
     for (let i = 0; i < 10; i++) {
@@ -27,7 +27,7 @@ const GenerateImage = (props: Props) => {
     let downloadURL;
     const uploadImage = await storage
       .ref(`images/${result}.png`)
-      .putString(generatedPhoto.split(",")[1], "base64", {
+      .putString(generatedImage.split(",")[1], "base64", {
         contentType: "images/png",
       })
       .then(async (snapshot) => {
@@ -53,18 +53,18 @@ const GenerateImage = (props: Props) => {
 
         const data = await response.json();
 
-        const downloadedImage = await uploadToStorage(
+        const downloadURL = await uploadToStorage(
           `data:image/jpeg;base64,${data.photo}`
         );
-        setPhoto(String(downloadedImage));
+
+        setPhoto(String(downloadURL));
 
         toast.success("Generated", {
           id: notification,
         });
 
-
         setLoading(false);
-        setDisLiked(false);
+        setDislike(false);
         setGenerated(true);
       } catch (error) {
         toast.error("Upssss, error", {
@@ -80,19 +80,25 @@ const GenerateImage = (props: Props) => {
   return (
     <div className="flex-[0.65] py-6 px-10 2xl:px-0 flex flex-col items-center">
       <div className="w-full flex flex-col xl:flex-row flex-1 gap-5">
-        <GeneratedImage image={photo}/>
-        <Menu generateImage={generateImage} />
+        <Image image={photo} />
+        <Menu
+          generateImage={generateImage}
+          setDislike={setDislike}
+          dislike={dislike}
+          photo={photo}
+          prompt={prompt}
+        />
       </div>
       <div className="md:mt-10 2xl:mt-0 flex gap-5 w-full flex-col md:flex-row">
         <input
           type="text"
           placeholder="Enter a description of your image..."
-          className="px-6 py-4 bg-transparent border border-gray-500 rounded-md flex-1"
+          className="px-6 py-4 bg-transparent border border-gray-500 rounded-md flex-1 outline-none hover:border-gray-300 focus:border-gray-300 transition-all"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
         />
         <button
-          className="bg-[#0E76FD] px-10 py-4 xl:w-[200px] rounded-md 2xl:mr-10"
+          className="bg-[#0E76FD] px-10 py-4 xl:w-[200px] rounded-md 2xl:mr-10 border-2 border-[#0E76FD] hover:border-blue-400 transition-all"
           onClick={generateImage}
         >
           Generate
