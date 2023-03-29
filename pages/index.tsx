@@ -10,7 +10,7 @@ const Home = (props: Props) => {
     auth.signInAnonymously()
   }, [])
   return (
-    <div className='w-full min-h-screen flex flex-col items-center text-white'>
+    <div className='w-full min-h-screen flex flex-col items-center text-white overflow-y-scroll md:overflow-y-scroll'>
       <Header />
       <Main />
     </div>

@@ -23,9 +23,10 @@ type Props = {
   dislike: boolean;
   photo: string;
   prompt: string;
+  selectedImage: string
 };
 
-const Menu = ({ generateImage, setDislike, dislike, photo, prompt }: Props) => {
+const Menu = ({ generateImage, setDislike, dislike, photo, prompt, selectedImage }: Props) => {
   const [liked, setLiked] = useState<boolean>(false);
   const { address, isConnected } = useAccount();
 
@@ -40,7 +41,7 @@ const Menu = ({ generateImage, setDislike, dislike, photo, prompt }: Props) => {
     const notification = toast.loading("Coping...");
     try {
       navigator.clipboard.writeText(photo);
-      toast.success("Copied successfully", {
+      toast.success("Downloaded successfully", {
         id: notification,
       });
     } catch (error) {
@@ -86,7 +87,7 @@ const Menu = ({ generateImage, setDislike, dislike, photo, prompt }: Props) => {
           )
         }
         handleClick={likeImage}
-        active={photo.length == 0 ? false : true}
+        active={photo.length > 0 && true}
       />
       <MenuButton
         text="Dislike"
@@ -101,13 +102,14 @@ const Menu = ({ generateImage, setDislike, dislike, photo, prompt }: Props) => {
         active={photo.length == 0 ? false : liked ? false : true}
       />
       <a
-        href={photo}
+        href={(photo || selectedImage) || '#'}
         target="_blank"
         className="w-full sm:w-[200px] md:w-fit xl:w-[200px]"
+        
       >
         <MenuButton
           text="Export"
-          active={liked == true}
+          active={selectedImage.length > 0 && true || liked == true}
           icon={<ArchiveBoxArrowDownIcon className="w-6 h-6" />}
           handleClick={uploadGeneratedImage}
         />

@@ -7,16 +7,15 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import { storage } from "@/firebase";
 
-type Props = {};
+type Props = {
+    selectedImage: string
+};
 
-const GenerateImage = (props: Props) => {
+const GenerateImage = ({selectedImage}: Props) => {
   const [prompt, setPrompt] = useState<string>("");
   const [photo, setPhoto] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [liked, setLiked] = useState<boolean>(false);
   const [dislike, setDislike] = useState<boolean>(false);
-  const [generated, setGenerated] = useState<boolean>(false);
-  const { address, isConnected } = useAccount();
 
   const uploadToStorage = async (generatedImage: string) => {
     let symbols = "qwertyuiopasdfghjklzxcvvbnnm1234567890!@#$%^&*()_+<>?|}{[]~";
@@ -65,7 +64,6 @@ const GenerateImage = (props: Props) => {
 
         setLoading(false);
         setDislike(false);
-        setGenerated(true);
       } catch (error) {
         toast.error("Upssss, error", {
           id: notification,
@@ -76,17 +74,17 @@ const GenerateImage = (props: Props) => {
       alert("Please enter a prompt");
     }
   };
-
   return (
     <div className="flex-[0.65] py-6 px-10 2xl:px-0 flex flex-col items-center">
       <div className="w-full flex flex-col xl:flex-row flex-1 gap-5">
-        <Image image={photo} />
+        <Image image={photo || selectedImage} loading={loading}/>
         <Menu
           generateImage={generateImage}
           setDislike={setDislike}
           dislike={dislike}
           photo={photo}
           prompt={prompt}
+          selectedImage={selectedImage}
         />
       </div>
       <div className="md:mt-10 2xl:mt-0 flex gap-5 w-full flex-col md:flex-row">
